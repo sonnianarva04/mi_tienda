@@ -1,0 +1,148 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Proveedores{% endblock %}
+
+{% block contenido %}
+
+<!-- Título y botón para registrar proveedores -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="titulo-pagina mb-0">
+        Listado de Proveedores
+    </h2>
+
+    <a href="{% url 'facturacion:proveedor_crear' %}"
+       class="btn btn-verde">
+        + Nuevo proveedor
+    </a>
+
+</div>
+
+
+<!-- Buscador por nombre, apellido o RUC -->
+<form method="get" class="d-flex gap-2 mb-3">
+
+    <input type="text"
+           name="q"
+           value="{{ q }}"
+           class="form-control"
+           placeholder="Buscar por nombre, apellido o RUC...">
+
+    <button type="submit" class="btn btn-outline-secondary">
+        Buscar
+    </button>
+
+</form>
+
+<!-- Tabla de proveedores registrados -->
+<div class="tarjeta table-responsive">
+
+    <table class="table table-hover align-middle">
+
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Logo</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>RUC</th>
+                <th>Correo</th>
+                <th>Contacto</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for proveedor in proveedores %}
+
+            <tr>
+                <td>{{ forloop.counter }}</td>
+
+                <!-- Mostramos el logo si existe -->
+                <td>
+                    {% if proveedor.logo %}
+                        <img src="{{ proveedor.logo.url }}"
+                             alt="Logo de {{ proveedor.nombre }}"
+                             width="55"
+                             height="55"
+                             style="object-fit: contain;">
+                    {% else %}
+                        <span class="text-muted">Sin logo</span>
+                    {% endif %}
+                </td>
+
+                <td>{{ proveedor.nombre }}</td>
+                <td>{{ proveedor.apellido }}</td>
+                <td>{{ proveedor.ruc }}</td>
+                <td>{{ proveedor.email|default:"—" }}</td>
+                <td>{{ proveedor.contacto|default:"—" }}</td>
+
+                  <!-- Botón para editar un proveedor -->
+               
+                 <!-- Acciones para cada proveedor -->
+                <td>
+                   <div class="d-flex gap-2">
+
+                     <!-- Editar los datos del proveedor -->
+                     <a href="{% url 'facturacion:proveedor_editar' proveedor.pk %}"
+                     class="btn btn-sm btn-outline-primary">
+                      Editar
+                     </a>
+
+                     <!-- Eliminar un proveedor -->
+                     <a href="{% url 'facturacion:proveedor_eliminar' proveedor.pk %}"
+                        class="btn btn-sm btn-outline-danger">
+                         Eliminar
+                     </a>
+
+                    </div>
+                </td>
+
+
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-3">
+                    No hay proveedores registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+<!-- Paginación de proveedores -->
+{% if is_paginated %}
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+
+    {% if page_obj.has_previous %}
+        <a href="?q={{ q|urlencode }}&page={{ page_obj.previous_page_number }}"
+           class="btn btn-outline-secondary btn-sm">
+            Anterior
+        </a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+    <span>
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?q={{ q|urlencode }}&page={{ page_obj.next_page_number }}"
+           class="btn btn-outline-secondary btn-sm">
+            Siguiente
+        </a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+{% endblock %}

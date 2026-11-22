@@ -1,0 +1,135 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Clientes{% endblock %}
+
+{% block contenido %}
+
+<!-- Título del listado -->
+
+<!-- Título y botón para registrar clientes -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="titulo-pagina mb-0">
+        Listado de Clientes
+    </h2>
+
+    <a href="{% url 'facturacion:cliente_crear' %}"
+       class="btn btn-verde">
+        + Nuevo cliente
+    </a>
+
+</div>
+
+
+<!-- Buscador por apellido o cédula -->
+<form method="get" class="d-flex gap-2 mb-3">
+    <input type="text"
+           name="q"
+           value="{{ q }}"
+           class="form-control"
+           placeholder="Buscar por apellido o cédula...">
+
+    <button type="submit" class="btn btn-outline-secondary">
+        Buscar
+    </button>
+</form>
+
+<!-- Tabla de clientes -->
+<div class="tarjeta table-responsive">
+
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Cédula</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+               <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ cliente.cedula }}</td>
+                <td>{{ cliente.nombres }}</td>
+                <td>{{ cliente.apellidos }}</td>
+                <td>{{ cliente.email|default:"—" }}</td>
+                <td>{{ cliente.telefono|default:"—" }}</td>
+
+             <!-- Botón para editar el cliente -->
+            
+        
+<!-- Acciones para cada cliente -->
+       <td>
+           <div class="d-flex gap-2">
+
+               <!-- Consultar los datos y las ventas -->
+               <a href="{% url 'facturacion:cliente_detalle' cliente.pk %}"
+                  class="btn btn-sm btn-outline-success">
+                   Ver detalle
+                </a>
+                <!-- Modificar los datos -->
+                <a href="{% url 'facturacion:cliente_editar' cliente.pk %}"
+                   class="btn btn-sm btn-outline-primary">
+                    Editar
+                </a>
+
+                <!-- Confirmar eliminación -->
+                <a href="{% url 'facturacion:cliente_eliminar' cliente.pk %}"
+                   class="btn btn-sm btn-outline-danger">
+                    Eliminar
+                </a>
+
+            </div>
+        </td>
+
+
+
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center py-3">
+                    No hay clientes registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginación de cinco clientes -->
+{% if is_paginated %}
+<div class="d-flex justify-content-between align-items-center mt-3">
+
+    {% if page_obj.has_previous %}
+        <a href="?q={{ q|urlencode }}&page={{ page_obj.previous_page_number }}"
+           class="btn btn-outline-secondary btn-sm">
+            Anterior
+        </a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+    <span>
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?q={{ q|urlencode }}&page={{ page_obj.next_page_number }}"
+           class="btn btn-outline-secondary btn-sm">
+            Siguiente
+        </a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+</div>
+{% endif %}
+
+{% endblock %}

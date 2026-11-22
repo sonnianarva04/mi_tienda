@@ -1,0 +1,171 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Compras{% endblock %}
+
+{% block contenido %}
+
+<!-- TAREA 5 - LISTADO DE COMPRAS -->
+
+
+<!-- Título y botón para registrar compras -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2 class="titulo-pagina mb-0">
+        Listado de Compras
+    </h2>
+
+    <a href="{% url 'facturacion:compra_crear' %}"
+       class="btn btn-verde">
+        + Nueva compra
+    </a>
+
+</div>
+
+
+<!-- Buscador y filtro por tipo de pago -->
+<form method="get" class="row g-2 mb-3">
+
+    <div class="col-md-8">
+        <input type="text"
+               name="q"
+               value="{{ q }}"
+               class="form-control"
+               placeholder="Buscar por proveedor o RUC...">
+    </div>
+
+    <div class="col-md-3">
+        <select name="tipo_pago" class="form-select">
+            <option value="">Todos los pagos</option>
+
+            {% for valor, nombre in tipos_pago %}
+                <option value="{{ valor }}"
+                    {% if tipo_pago == valor %}selected{% endif %}>
+                    {{ nombre }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-1">
+        <button type="submit"
+                class="btn btn-outline-secondary">
+            Buscar
+        </button>
+    </div>
+
+</form>
+
+<!-- Tabla de compras -->
+<div class="tarjeta table-responsive">
+
+    <table class="table table-hover align-middle">
+
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Proveedor</th>
+                <th>Fecha</th>
+                <th>Tipo de pago</th>
+                <th>Total</th>
+                <th>Acciones</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for compra in compras %}
+            <tr>
+                <td>{{ compra.pk }}</td>
+                   
+                <td>
+                    {{ compra.proveedor.nombre }}
+                    {{ compra.proveedor.apellido }}
+                </td>
+
+                <td>
+                    {{ compra.fecha_hora|date:"d/m/Y H:i" }}
+                </td>
+
+                <td>
+                    {{ compra.get_tipo_pago_display }}
+                </td>
+
+                <td>
+                    ${{ compra.total|floatformat:2 }}
+                </td>
+                  
+              
+                 <!-- Acciones para cada compra -->
+                <td>
+                    <div class="d-flex gap-2">
+
+                       <!-- Consultar el detalle de la compra -->
+                        <a href="{% url 'facturacion:compra_detalle' compra.pk %}"
+                          class="btn btn-sm btn-outline-success">
+                          Ver detalle
+                        </a>
+
+                         <!-- Modificar la compra -->
+                        <a href="{% url 'facturacion:compra_editar' compra.pk %}"
+                           class="btn btn-sm btn-outline-primary">
+                           Editar
+                        </a>
+
+                         <!-- Eliminar la compra -->
+                        <a href="{% url 'facturacion:compra_eliminar' compra.pk %}"
+                           class="btn btn-sm btn-outline-danger">
+                           Eliminar
+                        </a>
+
+                    </div>
+                </td>
+
+
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-3">
+                    No hay compras registradas.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+<!-- Paginación -->
+{% if is_paginated %}
+
+<div class="d-flex justify-content-between mt-3">
+
+    {% if page_obj.has_previous %}
+        <a href="?q={{ q|urlencode }}&tipo_pago={{ tipo_pago|urlencode }}&page={{ page_obj.previous_page_number }}"
+           class="btn btn-outline-secondary btn-sm">
+            Anterior
+        </a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+    <span>
+        Página {{ page_obj.number }}
+        de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?q={{ q|urlencode }}&tipo_pago={{ tipo_pago|urlencode }}&page={{ page_obj.next_page_number }}"
+           class="btn btn-outline-secondary btn-sm">
+            Siguiente
+        </a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,148 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Detalle de compra{% endblock %}
+
+{% block contenido %}
+
+<!-- ========================================= -->
+<!-- TAREA 5 - DETALLE DE UNA COMPRA -->
+<!-- ========================================= -->
+
+<div class="tarjeta">
+
+    <!-- Título principal -->
+    <h2 class="titulo-pagina mb-4">
+        Detalle de la compra #{{ compra.pk }}
+    </h2>
+
+    <!-- Información general -->
+    <h5 class="mb-3">Datos de la compra</h5>
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+
+            <tbody>
+                <tr>
+                    <th>Proveedor</th>
+                    <td>
+                        {{ compra.proveedor.nombre }}
+                        {{ compra.proveedor.apellido }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>RUC</th>
+                    <td>{{ compra.proveedor.ruc }}</td>
+                </tr>
+
+                <tr>
+                    <th>Fecha y hora</th>
+                    <td>
+                        {{ compra.fecha_hora|date:"d/m/Y H:i" }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Tipo de pago</th>
+                    <td>
+                        {{ compra.get_tipo_pago_display }}
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- Productos registrados -->
+    <h5 class="mt-4 mb-3">
+        Productos comprados
+    </h5>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Costo unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for detalle in compra.detalles.all %}
+
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>{{ detalle.producto.nombre }}</td>
+
+                    <td>{{ detalle.cantidad }}</td>
+
+                    <td>
+                        ${{ detalle.precio|floatformat:2 }}
+                    </td>
+
+                    <td>
+                        ${{ detalle.subtotal|floatformat:2 }}
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No hay productos registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- Resumen de valores -->
+    <div class="row justify-content-end mt-4">
+        <div class="col-md-5">
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th>Subtotal</th>
+                    <td class="text-end">
+                        ${{ compra.subtotal|floatformat:2 }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>IVA ({{ iva_porcentaje|floatformat:0 }}%)</th>
+                    <td class="text-end">
+                        ${{ compra.iva|floatformat:2 }}
+                    </td>
+                </tr>
+
+                <tr class="table-light">
+                    <th>Total de la compra</th>
+                    <th class="text-end">
+                        ${{ compra.total|floatformat:2 }}
+                    </th>
+                </tr>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!-- Regresar al listado -->
+    <div class="mt-4">
+        <a href="{% url 'facturacion:compra_lista' %}"
+           class="btn btn-outline-secondary">
+            Volver a compras
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

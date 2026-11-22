@@ -1,0 +1,181 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+
+<!-- TAREA 5 - COMPRAS CON DETALLE -->
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <div class="tarjeta">
+
+            <!-- Título de la página -->
+            <h2 class="titulo-pagina mb-4">
+                {{ titulo }}
+            </h2>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- DATOS PRINCIPALES -->
+                <h5 class="mb-3">Datos de la compra</h5>
+
+                {% for campo in form %}
+                    <div class="mb-3">
+                        <label class="form-label"
+                               for="{{ campo.id_for_label }}">
+                            {{ campo.label }}
+                        </label>
+
+                        {{ campo }}
+
+                        {% for error in campo.errors %}
+                            <div class="text-danger small">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                {{ form.non_field_errors }}
+
+                <hr>
+
+                <!-- PRODUCTOS DE LA COMPRA -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Detalle de productos</h5>
+
+                    <button type="button"
+                            id="agregar-producto"
+                            class="btn btn-verde btn-sm">
+                        + Agregar producto
+                    </button>
+                </div>
+
+                <!-- Campos de control del formset -->
+                {{ detalles.management_form }}
+
+                {% if detalles.non_form_errors %}
+                    <div class="alert alert-danger">
+                        {{ detalles.non_form_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Costo unitario</th>
+                                <th>Quitar</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tabla-detalles">
+
+                            {% for fila in detalles %}
+                            <tr>
+                                <td>
+                                    {{ fila.id }}
+                                    {{ fila.producto }}
+                                    {{ fila.producto.errors }}
+                                </td>
+
+                                <td>
+                                    {{ fila.cantidad }}
+                                    {{ fila.cantidad.errors }}
+                                </td>
+
+                                <td>
+                                    {{ fila.precio }}
+                                    {{ fila.precio.errors }}
+                                </td>
+
+                                <td class="text-center">
+                                    {{ fila.DELETE }}
+                                    {{ fila.non_field_errors }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Plantilla para agregar más productos -->
+                <template id="plantilla-detalle">
+                    <tr>
+                        <td>
+                            {{ detalles.empty_form.id }}
+                            {{ detalles.empty_form.producto }}
+                        </td>
+
+                        <td>
+                            {{ detalles.empty_form.cantidad }}
+                        </td>
+
+                        <td>
+                            {{ detalles.empty_form.precio }}
+                        </td>
+
+                        <td class="text-center">
+                            {{ detalles.empty_form.DELETE }}
+                        </td>
+                    </tr>
+                </template>
+
+                <!-- BOTONES -->
+                <div class="d-flex gap-2 mt-4">
+
+                    <button type="submit"
+                            class="btn btn-verde">
+                        {{ boton }}
+                    </button>
+
+                    <a href="{% url 'facturacion:compra_lista' %}"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Agregar nuevas filas al detalle -->
+<script>
+    document.getElementById("agregar-producto")
+        .addEventListener("click", function () {
+
+        const total = document.getElementById(
+            "id_{{ detalles.prefix }}-TOTAL_FORMS"
+        );
+
+        const numero = parseInt(total.value, 10);
+
+        const plantilla = document.getElementById(
+            "plantilla-detalle"
+        ).innerHTML;
+
+        const nuevaFila = plantilla.replace(
+            /__prefix__/g, numero
+        );
+
+        document.getElementById(
+            "tabla-detalles"
+        ).insertAdjacentHTML(
+            "beforeend",
+            nuevaFila
+        );
+
+        total.value = numero + 1;
+    });
+</script>
+
+{% endblock %}

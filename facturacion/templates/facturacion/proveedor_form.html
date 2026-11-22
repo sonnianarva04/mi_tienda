@@ -1,0 +1,72 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="tarjeta">
+
+            <!-- Título del formulario -->
+            <h2 class="titulo-pagina mb-4">
+                {{ titulo }}
+            </h2>
+
+            <!-- Formulario de proveedores con imagen -->
+            <form method="post"
+                  enctype="multipart/form-data"
+                  novalidate>
+
+                {% csrf_token %}
+
+                <!-- Errores generales del formulario -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Campos del proveedor -->
+                {% for campo in form %}
+                    <div class="mb-3">
+
+                        <label class="form-label"
+                               for="{{ campo.id_for_label }}">
+                            {{ campo.label }}
+                        </label>
+
+                        {{ campo }}
+
+                        <!-- Errores de validación -->
+                        {% for error in campo.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+
+                <!-- Botones -->
+                <div class="d-flex gap-2 mt-4">
+
+                    <button type="submit" class="btn btn-verde">
+                        {{ boton }}
+                    </button>
+
+                    <a href="{% url 'facturacion:proveedor_lista' %}"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

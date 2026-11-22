@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Eliminar cliente{% endblock %}
+
+{% block contenido %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="tarjeta">
+
+            <!-- Título de confirmación -->
+            <h2 class="titulo-pagina mb-4">
+                Eliminar cliente
+            </h2>
+
+            <!-- Información del cliente -->
+            <div class="alert alert-warning">
+                ¿Estás seguro de que deseas eliminar al cliente
+                <strong>
+                    {{ cliente.nombres }} {{ cliente.apellidos }}
+                </strong>?
+            </div>
+
+            <p class="text-muted">
+                Esta acción eliminará el registro del cliente.
+                Si tiene ventas registradas, el sistema impedirá
+                su eliminación.
+            </p>
+
+            <!-- Confirmación mediante POST -->
+            <form method="post">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-danger">
+                    Sí, eliminar
+                </button>
+
+                <a href="{% url 'facturacion:cliente_lista' %}"
+                   class="btn btn-outline-secondary">
+                    Cancelar
+                </a>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

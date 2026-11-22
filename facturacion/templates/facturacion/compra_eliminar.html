@@ -1,0 +1,77 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Eliminar compra{% endblock %}
+
+{% block contenido %}
+
+<!-- ========================================= -->
+<!-- TAREA 5 - ELIMINAR COMPRA -->
+<!-- ========================================= -->
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="tarjeta">
+
+            <!-- Título de la pantalla -->
+            <h2 class="titulo-pagina mb-4">
+                Eliminar compra
+            </h2>
+
+            <!-- Mensaje de confirmación -->
+            <div class="alert alert-warning">
+                ¿Estás seguro de que deseas eliminar
+                la compra <strong>#{{ compra.pk }}</strong>
+                del proveedor
+                <strong>
+                    {{ compra.proveedor.nombre }}
+                    {{ compra.proveedor.apellido }}
+                </strong>?
+            </div>
+
+            <!-- Información de la compra -->
+            <div class="mb-3">
+                <p>
+                    <strong>Fecha:</strong>
+                    {{ compra.fecha_hora|date:"d/m/Y H:i" }}
+                </p>
+
+                <p>
+                    <strong>Total:</strong>
+                    ${{ compra.total|floatformat:2 }}
+                </p>
+            </div>
+
+            <!-- Advertencia sobre el inventario -->
+            <p class="text-muted">
+                Esta acción eliminará la compra y sus
+                productos asociados. También descontará
+                del inventario las cantidades registradas
+                en esta compra.
+
+                Si no existe stock suficiente, el sistema
+                impedirá la eliminación.
+            </p>
+
+            <!-- Confirmar mediante POST -->
+            <form method="post">
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="btn btn-danger">
+                    Sí, eliminar
+                </button>
+
+                <a href="{% url 'facturacion:compra_lista' %}"
+                   class="btn btn-outline-secondary">
+                    Cancelar
+                </a>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
